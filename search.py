@@ -11,6 +11,8 @@ master_password = None
 
 
 def search(callback):
+
+
     global master_password
     FONT = ("Comic Sans MS", 14)
     file_path = os.path.expandvars(r'C:\Users\%username%\AppData\Local\mypasswd\db.json')
@@ -92,6 +94,25 @@ def search(callback):
         password_entry.configure(show='')
         password_entry.configure(state='readonly')
 
+    def delete():
+        global passwd
+        keyword = search_entry.get()
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+            if keyword in data:
+                confirm = messagebox.askyesno("Delete Password!", f"Do you want to delete the entry for {keyword}?")
+                if confirm:
+                    del data[keyword]
+                    with open(file_path, 'w') as file:
+                        json.dump(data, file, indent=4)
+                    user_entry.configure(state='normal')
+                    password_entry.configure(state='normal')
+                    user_entry.delete(0, tk.END)
+                    password_entry.delete(0, tk.END)
+                    user_entry.configure(state='readonly')
+                    password_entry.configure(state='readonly')
+                    passwd = None
+
     root = tk.Tk()
     root.title("Search Passwords")
     root.geometry("500x200")
@@ -148,4 +169,8 @@ def search(callback):
     cp.grid(row=2, column=2, padx=5, pady=5)
     reveal = ttk.Button(padding_frame, text="View", command=view, style="cp.TButton")
     reveal.grid(row=2, column=3, padx=5, pady=5)
+    delete_button = ttk.Button(padding_frame, text="Delete", command=delete, style="Search.TButton")
+    delete_button.grid(row=3, column=2, padx=5, pady=5)
+
+
     root.mainloop()
