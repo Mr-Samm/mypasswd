@@ -9,6 +9,7 @@ from profile import create_profile
 import os
 from auth import authenticate
 from search import search
+import time
 
 folder_path = os.path.expandvars(r'C:\Users\%username%\AppData\Local\mypasswd')
 file_path = os.path.expandvars(r'C:\Users\%username%\AppData\Local\mypasswd\db.json')
@@ -19,6 +20,25 @@ else:
     pass
 
 authenticated_password = None
+
+
+def check_inactivity():
+    inactivity_threshold = 600
+    current_time = time.time()
+    time_elapsed = current_time - last_activity_time.get()
+
+    if time_elapsed > inactivity_threshold:
+        window.destroy()
+        window.quit()
+        messagebox.showinfo(title="Mypasswd", message="Session Timeout!")
+        exit()
+
+    else:
+        window.after(1000, check_inactivity)
+
+
+def on_user_activity(event):
+    last_activity_time.set(time.time())
 
 
 def callback(password):
@@ -33,8 +53,8 @@ def add_b():
 
     data = {
         url.url_en.get(): {
-            "user": base64.b64encode(encrypted_user).decode(),
-            "password": base64.b64encode(encrypted_password).decode(),
+            "user": base64.b64encode(encrypted_user).decode('utf-8'),
+            "password": base64.b64encode(encrypted_password).decode('utf-8'),
         }
     }
 
@@ -44,9 +64,8 @@ def add_b():
         messagebox.showwarning(title="Empty fields!", message="Please make sure to write USER/EMAIL")
     elif not password.pass_en.get():
         messagebox.showwarning(title="Empty fields!", message="Please make sure to write PASSWORD")
-
     else:
-        ask = messagebox.askyesno(title="Save Login?",
+        ask = messagebox.askyesno(title="Save Login",
                                   message=f"Would you like to save: {url.url_en.get()}\nUser/Email:  {user.user_en.get()}\nPassword: {password.pass_en.get()}\n")
         if ask:
             def disappear():
@@ -143,5 +162,14 @@ cp = Button(x=700, y=597, text="Copy", command=copy)
 generate = Button(x=800, y=597, text="Generate", command=pass_generate, )
 add = Button(x=400, y=650, text="Add", command=add_b)
 search_b = Button(x=500, y=650, command=search_A, text="Search")
+
+last_activity_time = tk.DoubleVar()
+last_activity_time.set(time.time())
+
+window.bind('<Motion>', on_user_activity)
+window.bind('<Button>', on_user_activity)
+window.bind('<Key>', on_user_activity)
+
+check_inactivity()
 
 window.mainloop()
