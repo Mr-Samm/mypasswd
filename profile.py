@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import messagebox
 from encryption import *
 import base64
+import random
 
 master_pass = ""
 
@@ -86,7 +87,10 @@ def create_profile():
         ctypes.windll.kernel32.SetFileAttributesW(folder_path, 2)
         create_master_password()
         encryption = AES256Encryptor(passphrase=master_pass)
-        encryption_text = encryption.encrypt_text(text=master_pass)
+        token = ""
+        for x in range(50):
+            token += str(random.randint(0, 9))
+        encryption_text = encryption.encrypt_text(text=token)
         encode_encryption = base64.b64encode(encryption_text).decode()
         with open(msp, "w") as master_p:
             master_p.write(encode_encryption)
