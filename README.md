@@ -1,5 +1,5 @@
 # mypasswd
-open source password manager!
+open source password manager for windows!
 this is a GUI simple password manager that uses AES256-bit encryption with a random salt and random IV!
 ==========================================================================================================
 
